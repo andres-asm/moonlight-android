@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
 
     steps:
       - name: Checkout
@@ -29,11 +31,11 @@ jobs:
         run: ./gradlew assembleNonRootDebug assembleRootDebug
 
       - name: Decode keystore
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
+        if: env.HAS_KEYSTORE == 'true'
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --ignore-garbage -d > keystore.jks
 
       - name: Build release APKs
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.HAS_KEYSTORE == 'true'
         run: |
           ./gradlew assembleNonRootRelease assembleRootRelease \
             -Pandroid.injected.signing.store.file="${KEYSTORE_PATH}" \
@@ -59,14 +61,14 @@ jobs:
           path: app/build/outputs/apk/root/debug/*.apk
 
       - name: Upload nonRoot release APK
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.HAS_KEYSTORE == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: moonlight-nonroot-release
           path: app/build/outputs/apk/nonRoot/release/*.apk
 
       - name: Upload root release APK
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.HAS_KEYSTORE == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: moonlight-root-release
