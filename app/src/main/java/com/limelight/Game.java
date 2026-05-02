@@ -154,6 +154,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private View qamView;
     private Switch qamPerfSwitch;
     private Switch qamOscSwitch;
+    private Switch qamMouseSwitch;
     private boolean qamVisible = false;
     private String qamHost;
     private int qamPort;
