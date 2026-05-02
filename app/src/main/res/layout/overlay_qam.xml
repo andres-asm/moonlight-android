@@ -99,4 +99,12 @@
         android:text="@string/qam_disconnect"
         android:textColor="?android:colorAccent" />
 
+    <Button
+        android:id="@+id/qam_quit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:text="@string/qam_quit"
+        android:textColor="?android:colorAccent" />
+
 </LinearLayout>

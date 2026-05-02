@@ -155,6 +155,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private Switch qamPerfSwitch;
     private Switch qamOscSwitch;
     private boolean qamVisible = false;
+    private String qamHost;
+    private int qamPort;
+    private int qamHttpsPort;
+    private String qamUniqueId;
+    private X509Certificate qamServerCert;
 
     private MediaCodecDecoderRenderer decoderRenderer;
     private boolean reportedCrash;
@@ -324,6 +329,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         int httpsPort = Game.this.getIntent().getIntExtra(EXTRA_HTTPS_PORT, 0); // 0 is treated as unknown
         int appId = Game.this.getIntent().getIntExtra(EXTRA_APP_ID, StreamConfiguration.INVALID_APP_ID);
         String uniqueId = Game.this.getIntent().getStringExtra(EXTRA_UNIQUEID);
+        qamHost = host;
+        qamPort = port;
+        qamHttpsPort = httpsPort;
+        qamUniqueId = uniqueId;
         boolean appSupportsHdr = Game.this.getIntent().getBooleanExtra(EXTRA_APP_HDR, false);
         byte[] derCertData = Game.this.getIntent().getByteArrayExtra(EXTRA_SERVER_CERT);
 
@@ -343,6 +352,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         } catch (CertificateException e) {
             e.printStackTrace();
         }
+        qamServerCert = serverCert;
 
         if (appId == StreamConfiguration.INVALID_APP_ID) {
             finish();
@@ -1099,6 +1109,30 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        qamView.findViewById(R.id.qam_quit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            NvHTTP httpConn = new NvHTTP(new ComputerDetails.AddressTuple(qamHost, qamPort), qamHttpsPort,
+                                    qamUniqueId, qamServerCert, PlatformBinding.getCryptoProvider(Game.this));
+                            httpConn.quitApp();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        });
+                    }
+                }).start();
             }
         });
     }

@@ -128,7 +128,8 @@
     <string name="qam_title">Quick Menu</string>
     <string name="qam_perf_overlay">Performance Overlay</string>
     <string name="qam_osc">On-Screen Controller</string>
-    <string name="qam_disconnect">Disconnect</string>
+    <string name="qam_disconnect">Pause Session</string>
+    <string name="qam_quit">Quit Session</string>
     <string name="per_app_settings_title">Application Settings</string>
     <string name="per_app_settings_reset">Reset to Defaults</string>
     <string name="per_app_settings_global_default">Default (global setting)</string>
