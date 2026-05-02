@@ -1074,6 +1074,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             @Override
             public void onClick(View v) {
                 perfOverlayVisible = !perfOverlayVisible;
+                prefConfig.enablePerfOverlay = perfOverlayVisible;
                 performanceOverlayView.setVisibility(perfOverlayVisible ? View.VISIBLE : View.GONE);
                 qamPerfSwitch.setChecked(perfOverlayVisible);
             }
@@ -1399,6 +1400,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public boolean handleKeyDown(KeyEvent event) {
+        // Let Android handle focus navigation while QAM is open
+        if (qamVisible) {
+            return false;
+        }
+
         // Pass-through virtual navigation keys
         if ((event.getFlags() & KeyEvent.FLAG_VIRTUAL_HARD_KEY) != 0) {
             return false;
@@ -1481,6 +1487,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public boolean handleKeyUp(KeyEvent event) {
+        // Let Android handle focus navigation while QAM is open
+        if (qamVisible) {
+            return false;
+        }
+
         // Pass-through virtual navigation keys
         if ((event.getFlags() & KeyEvent.FLAG_VIRTUAL_HARD_KEY) != 0) {
             return false;
