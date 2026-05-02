@@ -1073,6 +1073,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         qamPerfSwitch = qamView.findViewById(R.id.qam_perf_overlay_switch);
         qamOscSwitch = qamView.findViewById(R.id.qam_osc_switch);
+        qamMouseSwitch = qamView.findViewById(R.id.qam_mouse_switch);
         final View oscRow = qamView.findViewById(R.id.qam_osc_row);
 
         if (virtualController == null) {
@@ -1092,16 +1093,30 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         oscRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (virtualController == null) {
-                    return;
-                }
                 oscVisible = !oscVisible;
                 if (oscVisible) {
+                    if (virtualController == null) {
+                        virtualController = new VirtualController(controllerHandler,
+                                (FrameLayout)streamView.getParent(), Game.this);
+                        virtualController.refreshLayout();
+                        oscRow.setAlpha(1.0f);
+                    }
                     virtualController.show();
-                } else {
-                    virtualController.hide();
+                }
+                else {
+                    if (virtualController != null) {
+                        virtualController.hide();
+                    }
                 }
                 qamOscSwitch.setChecked(oscVisible);
+            }
+        });
+
+        qamView.findViewById(R.id.qam_mouse_row).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setInputGrabState(!grabbedInput);
+                qamMouseSwitch.setChecked(grabbedInput);
             }
         });
 
@@ -1140,6 +1155,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private void showQam() {
         qamPerfSwitch.setChecked(perfOverlayVisible);
         qamOscSwitch.setChecked(oscVisible);
+        qamMouseSwitch.setChecked(grabbedInput);
+        if (oscVisible && virtualController != null) {
+            virtualController.hide();
+        }
         qamView.setVisibility(View.VISIBLE);
         qamView.findViewById(R.id.qam_perf_row).requestFocus();
         qamVisible = true;
@@ -1147,6 +1166,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
     private void hideQam() {
         qamView.setVisibility(View.GONE);
+        if (oscVisible && virtualController != null) {
+            virtualController.show();
+        }
         streamView.requestFocus();
         qamVisible = false;
     }

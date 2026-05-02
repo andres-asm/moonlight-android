@@ -128,6 +128,7 @@
     <string name="qam_title">Quick Menu</string>
     <string name="qam_perf_overlay">Performance Overlay</string>
     <string name="qam_osc">On-Screen Controller</string>
+    <string name="qam_mouse">Mouse Capture</string>
     <string name="qam_disconnect">Pause Session</string>
     <string name="qam_quit">Quit Session</string>
     <string name="per_app_settings_title">Application Settings</string>

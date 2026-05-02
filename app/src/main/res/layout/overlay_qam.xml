@@ -80,6 +80,34 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/qam_mouse_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/qam_row_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/qam_mouse"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="#FFFFFFFF" />
+
+        <Switch
+            android:id="@+id/qam_mouse_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false" />
+
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
