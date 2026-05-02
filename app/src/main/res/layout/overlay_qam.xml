@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/qam_panel"
-    android:layout_width="300dp"
+    android:layout_width="350dp"
     android:layout_height="match_parent"
     android:layout_gravity="end"
-    android:background="#E6000000"
+    android:background="#E6212121"
     android:orientation="vertical"
     android:padding="16dp"
     android:visibility="gone">
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/qam_perf_overlay"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceLarge"
             android:textColor="#FFFFFFFF" />
 
         <Switch
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/qam_osc"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceLarge"
             android:textColor="#FFFFFFFF" />
 
         <Switch
