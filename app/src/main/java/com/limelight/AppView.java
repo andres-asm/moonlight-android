@@ -23,8 +23,10 @@ import com.limelight.utils.SpinnerDialog;
 import com.limelight.utils.UiHelper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -35,6 +37,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,10 +45,15 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+
+import com.limelight.preferences.PerAppConfiguration;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -70,6 +78,7 @@ public class AppView extends Activity implements AdapterFragmentCallbacks {
     private final static int VIEW_DETAILS_ID = 5;
     private final static int CREATE_SHORTCUT_ID = 6;
     private final static int HIDE_APP_ID = 7;
+    private final static int APP_SETTINGS_ID = 8;
 
     public final static String HIDDEN_APPS_PREF_FILENAME = "HiddenApps";
 
@@ -415,6 +424,7 @@ public class AppView extends Activity implements AdapterFragmentCallbacks {
         }
 
         menu.add(Menu.NONE, VIEW_DETAILS_ID, 4, getResources().getString(R.string.applist_menu_details));
+        menu.add(Menu.NONE, APP_SETTINGS_ID, 5, getResources().getString(R.string.applist_menu_streaming_settings));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Only add an option to create shortcut if box art is loaded
@@ -498,6 +508,10 @@ public class AppView extends Activity implements AdapterFragmentCallbacks {
                 if (!shortcutHelper.createPinnedGameShortcut(computer, app.app, appBits)) {
                     Toast.makeText(AppView.this, getResources().getString(R.string.unable_to_pin_shortcut), Toast.LENGTH_LONG).show();
                 }
+                return true;
+
+            case APP_SETTINGS_ID:
+                showPerAppSettingsDialog(app);
                 return true;
 
             default:
@@ -643,6 +657,117 @@ public class AppView extends Activity implements AdapterFragmentCallbacks {
         UiHelper.applyStatusBarPadding(listView);
         registerForContextMenu(listView);
         listView.requestFocus();
+    }
+
+    private void showPerAppSettingsDialog(final AppObject app) {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_per_app_settings, null);
+        final Spinner resSpinner = view.findViewById(R.id.resolution_spinner);
+        final Spinner fpsSpinner = view.findViewById(R.id.fps_spinner);
+        final SeekBar bitrateSeekBar = view.findViewById(R.id.bitrate_seekbar);
+        final TextView bitrateLabel = view.findViewById(R.id.bitrate_label);
+
+        final String[] resEntries = {
+            getString(R.string.per_app_settings_global_default),
+            "360p (640×360)", "480p (854×480)", "720p (1280×720)",
+            "1080p (1920×1080)", "1440p (2560×1440)", "4K (3840×2160)"
+        };
+        final int[][] resValues = {
+            {0, 0}, {640, 360}, {854, 480}, {1280, 720},
+            {1920, 1080}, {2560, 1440}, {3840, 2160}
+        };
+
+        final int[] fpsValues = {0, 30, 60, 90, 120, 144, 240};
+        final String[] fpsEntries = new String[fpsValues.length];
+        fpsEntries[0] = getString(R.string.per_app_settings_global_default);
+        for (int i = 1; i < fpsValues.length; i++) {
+            fpsEntries[i] = fpsValues[i] + " FPS";
+        }
+
+        ArrayAdapter<String> resAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, resEntries);
+        resAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        resSpinner.setAdapter(resAdapter);
+
+        ArrayAdapter<String> fpsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, fpsEntries);
+        fpsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        fpsSpinner.setAdapter(fpsAdapter);
+
+        // SeekBar: progress 0 = default, progress N = N * 500 kbps (max 150 Mbps)
+        final int bitrateStep = 500;
+        bitrateSeekBar.setMax(150000 / bitrateStep);
+        bitrateSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (progress == 0) {
+                    bitrateLabel.setText(getString(R.string.per_app_settings_bitrate_default));
+                } else {
+                    bitrateLabel.setText(String.format("%.1f Mbps", progress * bitrateStep / 1000.0));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        // Load existing overrides
+        PerAppConfiguration override = PerAppConfiguration.readOverride(this, uuidString, app.app.getAppId());
+
+        int resIndex = 0;
+        if (override.width > 0) {
+            for (int i = 1; i < resValues.length; i++) {
+                if (resValues[i][0] == override.width && resValues[i][1] == override.height) {
+                    resIndex = i;
+                    break;
+                }
+            }
+        }
+        resSpinner.setSelection(resIndex);
+
+        int fpsIndex = 0;
+        if (override.fps > 0) {
+            for (int i = 1; i < fpsValues.length; i++) {
+                if (fpsValues[i] == override.fps) {
+                    fpsIndex = i;
+                    break;
+                }
+            }
+        }
+        fpsSpinner.setSelection(fpsIndex);
+
+        int bitrateProgress = override.bitrate > 0 ? override.bitrate / bitrateStep : 0;
+        bitrateSeekBar.setProgress(bitrateProgress);
+        bitrateLabel.setText(bitrateProgress == 0
+                ? getString(R.string.per_app_settings_bitrate_default)
+                : String.format("%.1f Mbps", bitrateProgress * bitrateStep / 1000.0));
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.per_app_settings_title) + ": " + app.app.getAppName())
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PerAppConfiguration newOverride = new PerAppConfiguration();
+                        int ri = resSpinner.getSelectedItemPosition();
+                        newOverride.width = resValues[ri][0];
+                        newOverride.height = resValues[ri][1];
+                        newOverride.fps = fpsValues[fpsSpinner.getSelectedItemPosition()];
+                        int progress = bitrateSeekBar.getProgress();
+                        newOverride.bitrate = progress > 0 ? progress * bitrateStep : 0;
+                        PerAppConfiguration.saveOverride(AppView.this, uuidString, app.app.getAppId(), newOverride);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setNeutralButton(R.string.per_app_settings_reset, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PerAppConfiguration.deleteOverride(AppView.this, uuidString, app.app.getAppId());
+                    }
+                })
+                .show();
     }
 
     public static class AppObject {

@@ -28,6 +28,7 @@ import com.limelight.nvstream.input.KeyboardPacket;
 import com.limelight.nvstream.input.MouseButtonPacket;
 import com.limelight.nvstream.jni.MoonBridge;
 import com.limelight.preferences.GlPreferences;
+import com.limelight.preferences.PerAppConfiguration;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.ui.GameGestures;
 import com.limelight.ui.StreamView;
@@ -319,6 +320,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         byte[] derCertData = Game.this.getIntent().getByteArrayExtra(EXTRA_SERVER_CERT);
 
         app = new NvApp(appName != null ? appName : "app", appId, appSupportsHdr);
+
+        String pcUuid = getIntent().getStringExtra(EXTRA_PC_UUID);
+        if (pcUuid != null) {
+            PerAppConfiguration.readOverride(this, pcUuid, appId).applyTo(prefConfig);
+        }
 
         X509Certificate serverCert = null;
         try {
