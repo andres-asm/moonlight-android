@@ -97,6 +97,6 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:text="@string/qam_disconnect"
-        android:textColor="#FFFF5555" />
+        android:textColor="?android:colorAccent" />
 
 </LinearLayout>

@@ -1066,8 +1066,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         final View oscRow = qamView.findViewById(R.id.qam_osc_row);
 
         if (virtualController == null) {
-            oscRow.setEnabled(false);
-            qamOscSwitch.setEnabled(false);
+            oscRow.setAlpha(0.4f);
         }
 
         qamView.findViewById(R.id.qam_perf_row).setOnClickListener(new View.OnClickListener() {
