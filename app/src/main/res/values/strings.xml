@@ -125,6 +125,10 @@
     <string name="applist_menu_tv_channel">Add to Channel</string>
     <string name="applist_menu_hide_app">Hide App</string>
     <string name="applist_menu_streaming_settings">Application Settings</string>
+    <string name="qam_title">Quick Menu</string>
+    <string name="qam_perf_overlay">Performance Overlay</string>
+    <string name="qam_osc">On-Screen Controller</string>
+    <string name="qam_disconnect">Disconnect</string>
     <string name="per_app_settings_title">Application Settings</string>
     <string name="per_app_settings_reset">Reset to Defaults</string>
     <string name="per_app_settings_global_default">Default (global setting)</string>

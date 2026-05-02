@@ -69,6 +69,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnGenericMotionListener;
 import android.view.View.OnSystemUiVisibilityChangeListener;
@@ -77,6 +78,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -147,6 +149,12 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private TextView notificationOverlayView;
     private int requestedNotificationOverlayVisibility = View.GONE;
     private TextView performanceOverlayView;
+    private boolean perfOverlayVisible;
+    private boolean oscVisible;
+    private View qamView;
+    private Switch qamPerfSwitch;
+    private Switch qamOscSwitch;
+    private boolean qamVisible = false;
 
     private MediaCodecDecoderRenderer decoderRenderer;
     private boolean reportedCrash;
@@ -517,7 +525,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                     this);
             virtualController.refreshLayout();
             virtualController.show();
+            oscVisible = true;
         }
+
+        perfOverlayVisible = prefConfig.enablePerfOverlay;
+        initQam();
 
         if (prefConfig.usbDriver) {
             // Start the USB driver
@@ -597,6 +609,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             if (isInPictureInPictureMode()) {
                 isHidingOverlays = true;
 
+                if (qamVisible) {
+                    hideQam();
+                }
+
                 if (virtualController != null) {
                     virtualController.hide();
                 }
@@ -615,11 +631,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
                 // Restore overlays to previous state when leaving PiP
 
-                if (virtualController != null) {
+                if (virtualController != null && oscVisible) {
                     virtualController.show();
                 }
 
-                if (prefConfig.enablePerfOverlay) {
+                if (perfOverlayVisible) {
                     performanceOverlayView.setVisibility(View.VISIBLE);
                 }
 
@@ -1029,6 +1045,76 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         // Correct the system UI visibility flags
         hideSystemUi(50);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (qamVisible) {
+            hideQam();
+        } else {
+            showQam();
+        }
+    }
+
+    private void initQam() {
+        FrameLayout rootView = (FrameLayout)streamView.getParent();
+        qamView = LayoutInflater.from(this).inflate(R.layout.overlay_qam, rootView, false);
+        rootView.addView(qamView);
+
+        qamPerfSwitch = qamView.findViewById(R.id.qam_perf_overlay_switch);
+        qamOscSwitch = qamView.findViewById(R.id.qam_osc_switch);
+        final View oscRow = qamView.findViewById(R.id.qam_osc_row);
+
+        if (virtualController == null) {
+            oscRow.setEnabled(false);
+            qamOscSwitch.setEnabled(false);
+        }
+
+        qamView.findViewById(R.id.qam_perf_row).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                perfOverlayVisible = !perfOverlayVisible;
+                performanceOverlayView.setVisibility(perfOverlayVisible ? View.VISIBLE : View.GONE);
+                qamPerfSwitch.setChecked(perfOverlayVisible);
+            }
+        });
+
+        oscRow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (virtualController == null) {
+                    return;
+                }
+                oscVisible = !oscVisible;
+                if (oscVisible) {
+                    virtualController.show();
+                } else {
+                    virtualController.hide();
+                }
+                qamOscSwitch.setChecked(oscVisible);
+            }
+        });
+
+        qamView.findViewById(R.id.qam_disconnect).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void showQam() {
+        qamPerfSwitch.setChecked(perfOverlayVisible);
+        qamOscSwitch.setChecked(oscVisible);
+        qamView.setVisibility(View.VISIBLE);
+        qamView.findViewById(R.id.qam_perf_row).requestFocus();
+        qamVisible = true;
+    }
+
+    private void hideQam() {
+        qamView.setVisibility(View.GONE);
+        streamView.requestFocus();
+        qamVisible = false;
     }
 
     @Override
