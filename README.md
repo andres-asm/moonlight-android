@@ -1,5 +1,8 @@
 # Moonlight Android
 
+## Fork reason:
+I wanted to have per-game settings, so I hooked that up alongside a quick access menu, more may come
+
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/232a8tadrrn8jv0k/branch/master?svg=true)](https://ci.appveyor.com/project/cgutman/moonlight-android/branch/master)
 [![Translation Status](https://hosted.weblate.org/widgets/moonlight/-/moonlight-android/svg-badge.svg)](https://hosted.weblate.org/projects/moonlight/moonlight-android/)
 
@@ -33,3 +36,11 @@ You can follow development on our [Discord server](https://moonlight-stream.org/
 
 Moonlight is the work of students at [Case Western](http://case.edu) and was
 started as a project at [MHacks](http://mhacks.org).
+
+## Screenshots
+
+* Per-Application Settings
+<img width="1922" height="1112" alt="image" src="https://github.com/user-attachments/assets/e8ebbeef-966a-460a-82ab-651901be091d" />
+* Quick Access Menu
+<img width="1922" height="1112" alt="image" src="https://github.com/user-attachments/assets/f55e0dcf-56ee-434d-beb8-63f39fd0509d" />
+
