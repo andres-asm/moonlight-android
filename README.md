@@ -41,6 +41,7 @@ started as a project at [MHacks](http://mhacks.org).
 
 * Per-Application Settings
 <img width="1922" height="1112" alt="image" src="https://github.com/user-attachments/assets/e8ebbeef-966a-460a-82ab-651901be091d" />
+
 * Quick Access Menu
 <img width="1922" height="1112" alt="image" src="https://github.com/user-attachments/assets/f55e0dcf-56ee-434d-beb8-63f39fd0509d" />
 
