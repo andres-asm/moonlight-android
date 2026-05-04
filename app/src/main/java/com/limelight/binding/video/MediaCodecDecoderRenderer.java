@@ -1458,7 +1458,7 @@ public class MediaCodecDecoderRenderer extends VideoDecoderRenderer implements C
                             (float)lastTwo.totalHostProcessingLatency / 10 / lastTwo.framesWithHostProcessingLatency)).append('\n');
                 }
                 sb.append(context.getString(R.string.perf_overlay_dectime, decodeTimeMs));
-                perfListener.onPerfUpdate(sb.toString());
+                perfListener.onPerfUpdate(fps.totalFps, sb.toString());
             }
 
             globalVideoStats.add(activeWindowVideoStats);

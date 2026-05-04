@@ -43,12 +43,12 @@
             android:textAppearance="?android:textAppearanceLarge"
             android:textColor="#FFFFFFFF" />
 
-        <Switch
-            android:id="@+id/qam_perf_overlay_switch"
+        <TextView
+            android:id="@+id/qam_perf_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false" />
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="#FFFFFFFF" />
 
     </LinearLayout>
 

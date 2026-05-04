@@ -149,10 +149,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private TextView notificationOverlayView;
     private int requestedNotificationOverlayVisibility = View.GONE;
     private TextView performanceOverlayView;
-    private boolean perfOverlayVisible;
+    private TextView perfOverlayFpsView;
+    private int perfOverlayLevel;
     private boolean oscVisible;
     private View qamView;
-    private Switch qamPerfSwitch;
+    private TextView qamPerfLevelView;
     private Switch qamOscSwitch;
     private Switch qamMouseSwitch;
     private boolean qamVisible = false;
@@ -285,7 +286,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         notificationOverlayView = findViewById(R.id.notificationOverlay);
 
-        performanceOverlayView = findViewById(R.id.performanceOverlay);
+        perfOverlayFpsView = findViewById(R.id.perfOverlayLevel1);
+        performanceOverlayView = findViewById(R.id.perfOverlayLevel2);
 
         inputCaptureProvider = InputCaptureManager.getInputCaptureProvider(this, this);
 
@@ -394,9 +396,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         }
 
         // Check if the user has enabled performance stats overlay
-        if (prefConfig.enablePerfOverlay) {
-            performanceOverlayView.setVisibility(View.VISIBLE);
-        }
 
         decoderRenderer = new MediaCodecDecoderRenderer(
                 this,
@@ -539,7 +538,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             oscVisible = true;
         }
 
-        perfOverlayVisible = prefConfig.enablePerfOverlay;
+        perfOverlayLevel = prefConfig.enablePerfOverlay ? 2 : 0;
+        updatePerfOverlay();
         initQam();
 
         if (prefConfig.usbDriver) {
@@ -628,6 +628,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                     virtualController.hide();
                 }
 
+                perfOverlayFpsView.setVisibility(View.GONE);
                 performanceOverlayView.setVisibility(View.GONE);
                 notificationOverlayView.setVisibility(View.GONE);
 
@@ -646,9 +647,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                     virtualController.show();
                 }
 
-                if (perfOverlayVisible) {
-                    performanceOverlayView.setVisibility(View.VISIBLE);
-                }
+                updatePerfOverlay();
 
                 notificationOverlayView.setVisibility(requestedNotificationOverlayVisibility);
 
@@ -1073,6 +1072,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         rootView.addView(qamView);
 
         qamPerfSwitch = qamView.findViewById(R.id.qam_perf_overlay_switch);
+        qamPerfLevelView = qamView.findViewById(R.id.qam_perf_level);
         qamOscSwitch = qamView.findViewById(R.id.qam_osc_switch);
         qamMouseSwitch = qamView.findViewById(R.id.qam_mouse_switch);
         final View oscRow = qamView.findViewById(R.id.qam_osc_row);
@@ -1084,10 +1084,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         qamView.findViewById(R.id.qam_perf_row).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                perfOverlayVisible = !perfOverlayVisible;
-                prefConfig.enablePerfOverlay = perfOverlayVisible;
-                performanceOverlayView.setVisibility(perfOverlayVisible ? View.VISIBLE : View.GONE);
-                qamPerfSwitch.setChecked(perfOverlayVisible);
+                perfOverlayLevel = (perfOverlayLevel + 1) % 3;
+                updatePerfOverlay();
+                qamPerfLevelView.setText(perfOverlayLevelLabel());
             }
         });
 
@@ -1154,7 +1153,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     }
 
     private void showQam() {
-        qamPerfSwitch.setChecked(perfOverlayVisible);
+        qamPerfLevelView.setText(perfOverlayLevelLabel());
         qamOscSwitch.setChecked(oscVisible);
         qamMouseSwitch.setChecked(grabbedInput);
         if (oscVisible && virtualController != null) {
@@ -2795,12 +2794,31 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         }
     }
 
+    private String perfOverlayLevelLabel() {
+        switch (perfOverlayLevel) {
+            case 1: return "L1";
+            case 2: return "L2";
+            default: return "Off";
+        }
+    }
+
+    private void updatePerfOverlay() {
+        prefConfig.enablePerfOverlay = (perfOverlayLevel != 0);
+        perfOverlayFpsView.setVisibility(perfOverlayLevel == 1 ? View.VISIBLE : View.GONE);
+        performanceOverlayView.setVisibility(perfOverlayLevel == 2 ? View.VISIBLE : View.GONE);
+    }
+
     @Override
-    public void onPerfUpdate(final String text) {
+    public void onPerfUpdate(final float fps, final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                performanceOverlayView.setText(text);
+                if (perfOverlayLevel == 1) {
+                    perfOverlayFpsView.setText(String.format(Locale.US, "%.1f", fps));
+                }
+                else if (perfOverlayLevel == 2) {
+                    performanceOverlayView.setText(text);
+                }
             }
         });
     }
