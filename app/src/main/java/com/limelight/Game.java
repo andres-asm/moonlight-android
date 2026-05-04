@@ -1102,7 +1102,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                         virtualController.refreshLayout();
                         oscRow.setAlpha(1.0f);
                     }
-                    virtualController.show();
+                    // Don't show yet - hideQam() will show it when the panel closes
                 }
                 else {
                     if (virtualController != null) {

@@ -51,12 +51,14 @@ jobs:
       - name: Upload nonRoot debug APK
         uses: actions/upload-artifact@v4
         with:
+          compression-level: 0
           name: moonlight-nonroot-debug
           path: app/build/outputs/apk/nonRoot/debug/*.apk
 
       - name: Upload root debug APK
         uses: actions/upload-artifact@v4
         with:
+          compression-level: 0
           name: moonlight-root-debug
           path: app/build/outputs/apk/root/debug/*.apk
 
@@ -64,6 +66,7 @@ jobs:
         if: env.HAS_KEYSTORE == 'true'
         uses: actions/upload-artifact@v4
         with:
+          compression-level: 0
           name: moonlight-nonroot-release
           path: app/build/outputs/apk/nonRoot/release/*.apk
 
@@ -71,5 +74,6 @@ jobs:
         if: env.HAS_KEYSTORE == 'true'
         uses: actions/upload-artifact@v4
         with:
+          compression-level: 0
           name: moonlight-root-release
           path: app/build/outputs/apk/root/release/*.apk
