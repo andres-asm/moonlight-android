@@ -1071,7 +1071,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         qamView = LayoutInflater.from(this).inflate(R.layout.overlay_qam, rootView, false);
         rootView.addView(qamView);
 
-        qamPerfSwitch = qamView.findViewById(R.id.qam_perf_overlay_switch);
         qamPerfLevelView = qamView.findViewById(R.id.qam_perf_level);
         qamOscSwitch = qamView.findViewById(R.id.qam_osc_switch);
         qamMouseSwitch = qamView.findViewById(R.id.qam_mouse_switch);
