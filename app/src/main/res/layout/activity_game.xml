@@ -29,7 +29,7 @@
         android:layout_gravity="left|top"
         android:textColor="#FF00FF00"
         android:textStyle="bold"
-        android:textSize="64sp"
+        android:textSize="32sp"
         android:preferKeepClear="true"
         android:visibility="gone" />
 
