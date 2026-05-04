@@ -2803,7 +2803,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     }
 
     private void updatePerfOverlay() {
-        prefConfig.enablePerfOverlay = (perfOverlayLevel != 0);
+        prefConfig.enablePerfOverlay = perfOverlayLevel != 0;
         perfOverlayFpsView.setVisibility(perfOverlayLevel == 1 ? View.VISIBLE : View.GONE);
         performanceOverlayView.setVisibility(perfOverlayLevel == 2 ? View.VISIBLE : View.GONE);
     }
